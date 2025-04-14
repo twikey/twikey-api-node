@@ -2,6 +2,16 @@
   "name": "twikey-api-client",
   "version": "0.0.1",
   "description": "Twikey API wrapper",
+  "homepage": "https://github.com/twikey/twikey-api-node",
+  "author": "Twikey <support@twikey.com> (https://twikey.com/)",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/twikey/twikey-api-node.git"
+  },
+  "bugs": "https://github.com/twikey/twikey-api-node/issues",
+  "engines": {
+    "node": ">=12.*"
+  },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
   "files": [
@@ -14,16 +24,6 @@
     "subscriptions",
     "api"
   ],
-  "homepage": "https://github.com/twikey/twikey-api-node",
-  "author": "Twikey <support@twikey.com> (https://twikey.com/)",
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/twikey/twikey-api-node.git"
-  },
-  "bugs": "https://github.com/twikey/twikey-api-node/issues",
-  "engines": {
-    "node": ">=12.*"
-  },
   "license": "MIT",
   "scripts": {
     "test": "tsx --test",

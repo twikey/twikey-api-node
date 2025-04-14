@@ -3,4 +3,3 @@ export * from "./models/Customer";
 export * from "./models/Document";
 export * from "./models/Invoice";
 export * from "./models/Transaction";
-export * from "./models/Webhook";

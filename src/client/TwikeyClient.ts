@@ -2,7 +2,7 @@ import axios, {AxiosInstance} from "axios";
 import {DocumentService} from "./services/DocumentService";
 import {InvoiceService} from "./services/InvoiceService";
 import {TransactionService} from "./services/TransactionService";
-import {TwikeyConfig} from "../models/types";
+import {TwikeyConfig} from "../models/Config";
 import {PaylinkService} from "./services/PaylinkService";
 import {SubscriptionService} from "./services/SubscriptionService";
 import {createHmac, timingSafeEqual} from "node:crypto";

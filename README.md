@@ -69,7 +69,7 @@ the behaviour or flow that the customer will experience. This 'ct' can be found 
 
 ```typescript
 
-let invite = twikeyClient.document.create({
+let invite = await twikeyClient.document.create({
    ct: Number(CT),
    email: "no-reply@example.com",
    firstname: "Twikey",

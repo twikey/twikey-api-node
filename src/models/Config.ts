@@ -3,7 +3,3 @@ export interface TwikeyConfig {
   apiUrl: string;
   userAgent?: string;
 }
-
-export interface WebhookConfig {
-  webhookKey: string;
-}
