@@ -1,10 +1,10 @@
-import {BaseResponse, BaseService} from "./BaseService";
+import {BaseService} from "./BaseService";
 import {
+  DocumentFeedMessage,
   DocumentRequest,
   DocumentResponse,
-  FeedOptions,
   DocumentSignRequest,
-  DocumentFeedMessage,
+  FeedOptions,
 } from "../../models/Document";
 
 export class DocumentService extends BaseService {
@@ -42,13 +42,21 @@ export class DocumentService extends BaseService {
       const response = await this.get("/mandate", formData, _headers);
       options.last_position = response.headers['x-last'];
       let data = response.data.Messages
-      if (!data.length) { isEmpty = true; }
-
-      for (const document of data) {
-        if (!document.AmdmtRsn && !document.CxlRsn) { document.IsNew = true; }
-        if (document.AmdmtRsn) { document.IsUpdated = true; }
-        if (document.CxlRsn) { document.IsCancelled = true; }
-        yield document;
+      if (!data.length) {
+        isEmpty = true;
+      } else {
+        for (const document of data) {
+          if (!document.AmdmtRsn && !document.CxlRsn) {
+            document.IsNew = true;
+          }
+          if (document.AmdmtRsn) {
+            document.IsUpdated = true;
+          }
+          if (document.CxlRsn) {
+            document.IsCancelled = true;
+          }
+          yield document;
+        }
       }
     }
   }

@@ -20,6 +20,7 @@ const getClient = () => {
         cachedClient = new TwikeyClient({
             apiKey: apiKey,
             apiUrl: url,
+            userAgent: "twikey-api-node-test"
         });
     }
     return cachedClient;
@@ -132,6 +133,14 @@ describe('Invoice', {skip: noApiConfigured}, async () => {
         assert.ok(invoice);
         assert.ok(invoice.id);
         assert.ok(invoice.state);
+    }
+    assert.ok(options.last_position);
+
+    const payments = await client.invoice.payment(options);
+    for await (const payment of payments) {
+        assert.ok(payment);
+        assert.ok(payment.origin.id);
+        assert.ok(payment.origin.number);
     }
     assert.ok(options.last_position);
 })

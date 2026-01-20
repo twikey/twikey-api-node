@@ -36,11 +36,13 @@ export class TransactionService extends BaseService {
     let isEmpty = false;
     while (!isEmpty) {
       const response = await this.get("/transaction", formData, _headers);
-      options.last_position = response.headers['x-last'];
-      if (!response.data.Entries.length) { isEmpty = true; }
-
-      for (const transaction of response.data.Entries) {
-        yield transaction;
+      if (!response.data.Entries.length) {
+        isEmpty = true;
+      } else {
+        options.last_position = response.headers['x-last'];
+        for (const transaction of response.data.Entries) {
+          yield transaction;
+        }
       }
     }
   }

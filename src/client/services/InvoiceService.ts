@@ -1,5 +1,5 @@
 import {BaseResponse, BaseService} from "./BaseService";
-import {InvoiceRequest, InvoiceResponse, InvoiceUpdateRequest,} from "../../models/Invoice";
+import {InvoiceRequest, InvoiceResponse, InvoiceUpdateRequest, PaymentResponse,} from "../../models/Invoice";
 import {FeedOptions} from "../../models/Document";
 
 
@@ -32,11 +32,43 @@ export class InvoiceService extends BaseService {
     let isEmpty = false;
     while (!isEmpty) {
       const response = await this.get("/invoice", formData, _headers);
-      options.last_position = response.headers['x-last'];
-      if (!response.data.Invoices.length) { isEmpty = true; }
+      if (!response.data.Invoices.length) {
+        isEmpty = true;
+      } else {
+        options.last_position = response.headers['x-last'];
+        for (const invoice of response.data.Invoices) {
+          yield invoice;
+        }
+      }
+    }
+  }
 
-      for (const invoice of response.data.Invoices) {
-        yield invoice;
+  async* payment(options?: FeedOptions): AsyncGenerator<PaymentResponse> {
+
+    const formData = new URLSearchParams();
+    let _headers: any = {};
+    if (options) {
+      if (options.start_position)
+        _headers['X-RESUME-AFTER'] = options.start_position;
+      if (options.includes) {
+        for (const include of options.includes) {
+          formData.append("include", include);
+        }
+      }
+    } else {
+      options = {}
+    }
+
+    let isEmpty = false;
+    while (!isEmpty) {
+      const response = await this.get("/invoice/payment/feed", formData, _headers);
+      if (!response.data.Payments.length) {
+        isEmpty = true;
+      } else {
+        options.last_position = response.headers['x-last'];
+        for (const payment of response.data.Payments) {
+          yield payment;
+        }
       }
     }
   }

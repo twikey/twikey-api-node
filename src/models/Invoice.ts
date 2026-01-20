@@ -27,6 +27,41 @@ export interface InvoiceResponse {
   number: string; // Invoice number
 }
 
+export interface PaymentResponse {
+  eventId: string;
+  eventType: "payment" | "payment_failure" | "refund";
+  occurredAt: string; // ISO date string
+  amount: number;
+  currency: string;
+  origin: Origin;
+  gateway: Gateway;
+  details: object;
+  error?: EventError;
+}
+
+export interface Origin {
+  object: "invoice";
+  id: string;
+  number: string;
+  ref: string;
+}
+
+export interface Gateway {
+  id: number;
+  name: string;
+  type: "bank" | "psp";
+  iban: string | null;
+}
+
+export interface EventError {
+  code: string;
+  description: string;
+  category: string;
+  externalCode: string;
+  action?: string;
+  actionStep?: number;
+}
+
 export interface InvoiceUpdateRequest {
   state?: string; // New state
   amount?: number; // New amount in cents

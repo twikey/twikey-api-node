@@ -28,11 +28,13 @@ export class PaylinkService extends BaseService {
     let isEmpty = false;
     while (!isEmpty) {
       const response = await this.get("/payment/link/feed");
-      options.last_position = response.headers['x-last'];
-      if (!response.data.Links.length) { isEmpty = true; }
-
-      for (const link of response.data.Links) {
-        yield link;
+      if (!response.data.Links.length) {
+        isEmpty = true;
+      } else {
+        options.last_position = response.headers['x-last'];
+        for (const link of response.data.Links) {
+          yield link;
+        }
       }
     }
   }
