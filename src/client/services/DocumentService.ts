@@ -40,11 +40,11 @@ export class DocumentService extends BaseService {
     let isEmpty = false;
     while (!isEmpty) {
       const response = await this.get("/mandate", formData, _headers);
-      options.last_position = response.headers['x-last'];
       let data = response.data.Messages
       if (!data.length) {
         isEmpty = true;
       } else {
+        options.last_position = response.headers['x-last'];
         for (const document of data) {
           if (!document.AmdmtRsn && !document.CxlRsn) {
             document.IsNew = true;

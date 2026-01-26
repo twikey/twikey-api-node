@@ -82,8 +82,13 @@ describe('Document', {skip: noApiConfigured}, async () => {
     assert.ok(details);
 
     let options: FeedOptions = {};
+    let hasDocuments = false;
     const feed = client.document.feed(options);
     for await (const document of feed) {
+        if (!hasDocuments) {
+            hasDocuments = true;
+            assert.ok(options.last_position);
+        }
         if (document.IsNew) {
             assert.ok(document);
             assert.ok(document.Mndt);
@@ -95,7 +100,6 @@ describe('Document', {skip: noApiConfigured}, async () => {
             assert.ok(document);
         }
     }
-    assert.ok(options.last_position);
 })
 
 describe('Invoice', {skip: noApiConfigured}, async () => {
@@ -128,21 +132,29 @@ describe('Invoice', {skip: noApiConfigured}, async () => {
     assert.ok(details);
 
     let options: FeedOptions = {};
+    let hasInvoices = false;
     const feed = await client.invoice.feed(options);
     for await (const invoice of feed) {
+        if (!hasInvoices) {
+            hasInvoices = true;
+            assert.ok(options.last_position);
+        }
         assert.ok(invoice);
         assert.ok(invoice.id);
         assert.ok(invoice.state);
     }
-    assert.ok(options.last_position);
 
+    let hasPayments = false;
     const payments = await client.invoice.payment(options);
     for await (const payment of payments) {
+        if (!hasPayments) {
+            hasPayments = true;
+            assert.ok(options.last_position);
+        }
         assert.ok(payment);
         assert.ok(payment.origin.id);
         assert.ok(payment.origin.number);
     }
-    assert.ok(options.last_position);
 })
 
 describe('Transaction', {skip: noApiConfigured}, async () => {
@@ -210,13 +222,17 @@ describe('Paylink', {skip: noApiConfigured}, async () => {
     assert.ok(link.url);
 
     let options: FeedOptions = {};
+    let hasLinks = false;
     const feed = await client.paylink.feed(options);
     for await (const link of feed) {
+        if (!hasLinks) {
+            hasLinks = true;
+            assert.ok(options.last_position);
+        }
         assert.ok(link);
         assert.ok(link.id);
         assert.ok(link.amount);
     }
-    assert.ok(options.last_position);
 })
 
 describe('Webhook', async () => {
