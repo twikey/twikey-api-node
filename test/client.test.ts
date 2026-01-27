@@ -3,6 +3,12 @@ import * as process from "node:process";
 import {describe, test} from "node:test";
 import * as assert from 'assert';
 import {faker} from '@faker-js/faker';
+import * as fs from 'fs';
+import * as path from 'path';
+
+const testPdfPath = path.join(__dirname, 'fixtures', 'empty.pdf');
+const testPdfBuffer = fs.readFileSync(testPdfPath);
+const testPdfBase64 = testPdfBuffer.toString('base64');
 
 const noApiConfigured = !process.env.TWIKEY_API_KEY;
 // console.log(process.env)
@@ -47,6 +53,8 @@ describe('Document', {skip: noApiConfigured}, async () => {
 
     const document = await client.document.create({
         ct: Number(CT),
+        iban: 'NL95BUNQ2025545371',
+        bic: 'BUNQNL2A',
         email: faker.internet.email(),
         firstname: faker.person.firstName(),
         lastname: faker.person.lastName(),
@@ -59,6 +67,14 @@ describe('Document', {skip: noApiConfigured}, async () => {
     assert.ok(document);
     assert.ok(document.mndtId);
     assert.ok(document.url);
+
+    await client.document.uploadPdf(document.mndtId, testPdfBuffer);
+
+    const mandatePdf = await client.document.pdf(document.mndtId);
+    assert.ok(mandatePdf);
+    assert.ok(mandatePdf.content);
+    assert.ok(mandatePdf.content.length > 0);
+    assert.strictEqual(mandatePdf.filename, `${document.mndtId}.pdf`);
 
     let importedMandate = 'IMPORT-' + faker.git.commitSha({length: 8});
     const signedDocument = await client.document.sign({
@@ -113,6 +129,7 @@ describe('Invoice', {skip: noApiConfigured}, async () => {
         amount: 500,
         date: today,
         duedate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+        pdf: testPdfBase64,
         customer: {
             l: 'nl',
             email: faker.internet.email(),
@@ -130,6 +147,12 @@ describe('Invoice', {skip: noApiConfigured}, async () => {
 
     const details = await client.invoice.detail(invoice.id);
     assert.ok(details);
+
+    const invoicePdf = await client.invoice.pdf(invoice.id);
+    assert.ok(invoicePdf);
+    assert.ok(invoicePdf.content);
+    assert.ok(invoicePdf.content.length > 0);
+    assert.strictEqual(invoicePdf.filename, `${invoice.id}.pdf`);
 
     let options: FeedOptions = {};
     let hasInvoices = false;

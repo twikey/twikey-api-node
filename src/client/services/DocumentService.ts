@@ -1,4 +1,4 @@
-import {BaseService} from "./BaseService";
+import {BaseService, PdfResponse} from "./BaseService";
 import {
   DocumentFeedMessage,
   DocumentRequest,
@@ -63,5 +63,13 @@ export class DocumentService extends BaseService {
 
   async updateStatus(mandateId: string, status: string): Promise<void> {
     await this.post(`/mandate/${mandateId}`, { status });
+  }
+
+  async pdf(mndtId: string): Promise<PdfResponse> {
+    return this.getPdf(`/mandate/pdf?mndtId=${mndtId}`, `${mndtId}.pdf`);
+  }
+
+  async uploadPdf(mndtId: string, pdfContent: Buffer): Promise<void> {
+    return this.postPdf(`/mandate/pdf?mndtId=${mndtId}`, pdfContent);
   }
 }

@@ -1,4 +1,4 @@
-import {BaseResponse, BaseService} from "./BaseService";
+import {BaseResponse, BaseService, PdfResponse} from "./BaseService";
 import {InvoiceRequest, InvoiceResponse, InvoiceUpdateRequest, PaymentResponse,} from "../../models/Invoice";
 import {FeedOptions} from "../../models/Document";
 
@@ -75,5 +75,9 @@ export class InvoiceService extends BaseService {
 
   async update(invoiceId: string, update: InvoiceUpdateRequest): Promise<BaseResponse<InvoiceResponse>> {
     return this.post(`/invoice/${invoiceId}`, update);
+  }
+
+  async pdf(invoiceId: string): Promise<PdfResponse> {
+    return this.getPdf(`/invoice/${invoiceId}/pdf`, `${invoiceId}.pdf`);
   }
 }
