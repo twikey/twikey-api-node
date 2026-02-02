@@ -3,6 +3,12 @@ import * as process from "node:process";
 import {describe, test} from "node:test";
 import * as assert from 'assert';
 import {faker} from '@faker-js/faker';
+import * as fs from 'fs';
+import * as path from 'path';
+
+const testPdfPath = path.join(__dirname, 'fixtures', 'empty.pdf');
+const testPdfBuffer = fs.readFileSync(testPdfPath);
+const testPdfBase64 = testPdfBuffer.toString('base64');
 
 const noApiConfigured = !process.env.TWIKEY_API_KEY;
 // console.log(process.env)
@@ -47,6 +53,8 @@ describe('Document', {skip: noApiConfigured}, async () => {
 
     const document = await client.document.create({
         ct: Number(CT),
+        iban: 'NL95BUNQ2025545371',
+        bic: 'BUNQNL2A',
         email: faker.internet.email(),
         firstname: faker.person.firstName(),
         lastname: faker.person.lastName(),
@@ -59,6 +67,14 @@ describe('Document', {skip: noApiConfigured}, async () => {
     assert.ok(document);
     assert.ok(document.mndtId);
     assert.ok(document.url);
+
+    await client.document.uploadPdf(document.mndtId, testPdfBuffer);
+
+    const mandatePdf = await client.document.pdf(document.mndtId);
+    assert.ok(mandatePdf);
+    assert.ok(mandatePdf.content);
+    assert.ok(mandatePdf.content.length > 0);
+    assert.strictEqual(mandatePdf.filename, `${document.mndtId}.pdf`);
 
     let importedMandate = 'IMPORT-' + faker.git.commitSha({length: 8});
     const signedDocument = await client.document.sign({
@@ -82,8 +98,13 @@ describe('Document', {skip: noApiConfigured}, async () => {
     assert.ok(details);
 
     let options: FeedOptions = {};
+    let hasDocuments = false;
     const feed = client.document.feed(options);
     for await (const document of feed) {
+        if (!hasDocuments) {
+            hasDocuments = true;
+            assert.ok(options.last_position);
+        }
         if (document.IsNew) {
             assert.ok(document);
             assert.ok(document.Mndt);
@@ -95,7 +116,6 @@ describe('Document', {skip: noApiConfigured}, async () => {
             assert.ok(document);
         }
     }
-    assert.ok(options.last_position);
 })
 
 describe('Invoice', {skip: noApiConfigured}, async () => {
@@ -109,6 +129,7 @@ describe('Invoice', {skip: noApiConfigured}, async () => {
         amount: 500,
         date: today,
         duedate: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString().split('T')[0],
+        pdf: testPdfBase64,
         customer: {
             l: 'nl',
             email: faker.internet.email(),
@@ -127,22 +148,36 @@ describe('Invoice', {skip: noApiConfigured}, async () => {
     const details = await client.invoice.detail(invoice.id);
     assert.ok(details);
 
+    const invoicePdf = await client.invoice.pdf(invoice.id);
+    assert.ok(invoicePdf);
+    assert.ok(invoicePdf.content);
+    assert.ok(invoicePdf.content.length > 0);
+    assert.strictEqual(invoicePdf.filename, `${invoice.id}.pdf`);
+
     let options: FeedOptions = {};
+    let hasInvoices = false;
     const feed = await client.invoice.feed(options);
     for await (const invoice of feed) {
+        if (!hasInvoices) {
+            hasInvoices = true;
+            assert.ok(options.last_position);
+        }
         assert.ok(invoice);
         assert.ok(invoice.id);
         assert.ok(invoice.state);
     }
-    assert.ok(options.last_position);
 
+    let hasPayments = false;
     const payments = await client.invoice.payment(options);
     for await (const payment of payments) {
+        if (!hasPayments) {
+            hasPayments = true;
+            assert.ok(options.last_position);
+        }
         assert.ok(payment);
         assert.ok(payment.origin.id);
         assert.ok(payment.origin.number);
     }
-    assert.ok(options.last_position);
 })
 
 describe('Transaction', {skip: noApiConfigured}, async () => {
@@ -210,13 +245,17 @@ describe('Paylink', {skip: noApiConfigured}, async () => {
     assert.ok(link.url);
 
     let options: FeedOptions = {};
+    let hasLinks = false;
     const feed = await client.paylink.feed(options);
     for await (const link of feed) {
+        if (!hasLinks) {
+            hasLinks = true;
+            assert.ok(options.last_position);
+        }
         assert.ok(link);
         assert.ok(link.id);
         assert.ok(link.amount);
     }
-    assert.ok(options.last_position);
 })
 
 describe('Webhook', async () => {

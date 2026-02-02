@@ -5,6 +5,7 @@ import {
   DocumentResponse,
   DocumentSignRequest,
   FeedOptions,
+  PdfResponse,
 } from "../../models/Document";
 
 export class DocumentService extends BaseService {
@@ -40,11 +41,11 @@ export class DocumentService extends BaseService {
     let isEmpty = false;
     while (!isEmpty) {
       const response = await this.get("/mandate", formData, _headers);
-      options.last_position = response.headers['x-last'];
       let data = response.data.Messages
       if (!data.length) {
         isEmpty = true;
       } else {
+        options.last_position = response.headers['x-last'];
         for (const document of data) {
           if (!document.AmdmtRsn && !document.CxlRsn) {
             document.IsNew = true;
@@ -63,5 +64,22 @@ export class DocumentService extends BaseService {
 
   async updateStatus(mandateId: string, status: string): Promise<void> {
     await this.post(`/mandate/${mandateId}`, { status });
+  }
+
+  async pdf(mndtId: string): Promise<PdfResponse> {
+    const response = await this.client.get(`/mandate/pdf?mndtId=${mndtId}`, {
+      headers: { 'Accept': 'application/pdf' },
+      responseType: 'arraybuffer'
+    });
+    return {
+      content: Buffer.from(response.data),
+      filename: `${mndtId}.pdf`
+    };
+  }
+
+  async uploadPdf(mndtId: string, pdfContent: Buffer): Promise<void> {
+    await this.client.post(`/mandate/pdf?mndtId=${mndtId}`, pdfContent, {
+      headers: { 'Content-Type': 'application/pdf' }
+    });
   }
 }

@@ -27,7 +27,7 @@ export class PaylinkService extends BaseService {
 
     let isEmpty = false;
     while (!isEmpty) {
-      const response = await this.get("/payment/link/feed");
+      const response = await this.get("/payment/link/feed", formData, _headers);
       if (!response.data.Links.length) {
         isEmpty = true;
       } else {

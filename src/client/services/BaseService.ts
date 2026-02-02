@@ -4,6 +4,12 @@ export interface BaseResponse<T> {
   data:T
   headers: any
 }
+
+export interface PdfResponse {
+  content: Buffer;
+  filename: string;
+}
+
 export class BaseService {
 
   constructor(protected readonly client: AxiosInstance) {}
