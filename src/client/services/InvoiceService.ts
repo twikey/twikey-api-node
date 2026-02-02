@@ -1,6 +1,6 @@
-import {BaseResponse, BaseService, PdfResponse} from "./BaseService";
+import {BaseResponse, BaseService} from "./BaseService";
 import {InvoiceRequest, InvoiceResponse, InvoiceUpdateRequest, PaymentResponse,} from "../../models/Invoice";
-import {FeedOptions} from "../../models/Document";
+import {FeedOptions, PdfResponse} from "../../models/Document";
 
 
 export class InvoiceService extends BaseService {
@@ -78,6 +78,13 @@ export class InvoiceService extends BaseService {
   }
 
   async pdf(invoiceId: string): Promise<PdfResponse> {
-    return this.getPdf(`/invoice/${invoiceId}/pdf`, `${invoiceId}.pdf`);
+    const response = await this.client.get(`/invoice/${invoiceId}/pdf`, {
+      headers: { 'Accept': 'application/pdf' },
+      responseType: 'arraybuffer'
+    });
+    return {
+      content: Buffer.from(response.data),
+      filename: `${invoiceId}.pdf`
+    };
   }
 }

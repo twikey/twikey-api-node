@@ -75,4 +75,8 @@ export interface FeedOptions {
     last_position?: number;
 }
 
+export interface PdfResponse {
+    content: Buffer;
+    filename: string;
+}
 

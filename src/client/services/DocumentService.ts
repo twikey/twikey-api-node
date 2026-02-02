@@ -1,10 +1,11 @@
-import {BaseService, PdfResponse} from "./BaseService";
+import {BaseService} from "./BaseService";
 import {
   DocumentFeedMessage,
   DocumentRequest,
   DocumentResponse,
   DocumentSignRequest,
   FeedOptions,
+  PdfResponse,
 } from "../../models/Document";
 
 export class DocumentService extends BaseService {
@@ -66,10 +67,19 @@ export class DocumentService extends BaseService {
   }
 
   async pdf(mndtId: string): Promise<PdfResponse> {
-    return this.getPdf(`/mandate/pdf?mndtId=${mndtId}`, `${mndtId}.pdf`);
+    const response = await this.client.get(`/mandate/pdf?mndtId=${mndtId}`, {
+      headers: { 'Accept': 'application/pdf' },
+      responseType: 'arraybuffer'
+    });
+    return {
+      content: Buffer.from(response.data),
+      filename: `${mndtId}.pdf`
+    };
   }
 
   async uploadPdf(mndtId: string, pdfContent: Buffer): Promise<void> {
-    return this.postPdf(`/mandate/pdf?mndtId=${mndtId}`, pdfContent);
+    await this.client.post(`/mandate/pdf?mndtId=${mndtId}`, pdfContent, {
+      headers: { 'Content-Type': 'application/pdf' }
+    });
   }
 }
