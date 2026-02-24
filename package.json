@@ -1,6 +1,6 @@
 {
   "name": "twikey-api-client",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Twikey API wrapper",
   "homepage": "https://github.com/twikey/twikey-api-node",
   "author": "Twikey <support@twikey.com> (https://twikey.com/)",
@@ -22,6 +22,7 @@
     "direct debit",
     "credit cards",
     "subscriptions",
+    "sepa direct debit",
     "api"
   ],
   "license": "MIT",
