@@ -18,7 +18,9 @@ payment options of your favorite PSP to allow other customers to pay as well.
 To use the Twikey API client, the following things are required:
 
 + Get yourself a [Twikey account](https://www.twikey.com).
-+ Nodejs >= 16.x
++ Node.js >= 16.x
+
+To develop or run the test suite in this repository, use Node.js >= 18.x because the local `tsx` test runner requires it.
 
 ## Installation ##
 
