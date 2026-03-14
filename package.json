@@ -10,7 +10,7 @@
   },
   "bugs": "https://github.com/twikey/twikey-api-node/issues",
   "engines": {
-    "node": ">=12.*"
+    "node": ">=16.0.0"
   },
   "types": "./dist/index.d.ts",
   "main": "./dist/index.js",
@@ -34,13 +34,13 @@
     "dist": "npm publish"
   },
   "dependencies": {
-    "@types/node": "^22.14.0",
-    "axios": "^1.13.5",
-    "typescript": "^5.8.3"
+    "axios": "^1.13.5"
   },
   "devDependencies": {
+    "@types/node": "^22.14.0",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
-    "@faker-js/faker": "^9.6.0"
+    "@faker-js/faker": "^9.6.0",
+    "typescript": "^5.8.3"
   }
 }
