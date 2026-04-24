@@ -11,6 +11,7 @@ export interface BaseInfo {
     country?: string;
     companyName?: string;
     coc?: string;
+    vatno?: string;
 }
 
 export interface DocumentRequest extends BaseInfo {
