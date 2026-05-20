@@ -140,7 +140,8 @@ describe('Invoice', {skip: noApiConfigured}, async () => {
             zip: faker.location.zipCode(),
             country: faker.location.countryCode(),
             companyName: faker.company.name(),
-            coc: faker.company.catchPhraseAdjective()
+            coc: faker.company.catchPhraseAdjective(),
+            vatno: faker.company.catchPhraseAdjective()
         }
     });
     assert.ok(invoice);
