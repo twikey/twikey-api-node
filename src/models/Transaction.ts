@@ -7,6 +7,7 @@ export interface TransactionRequest {
     amount: number;
     place?: string;
     refase2e?: boolean;
+    reservation?: boolean;
 }
 
 export interface Transaction {
@@ -26,4 +27,38 @@ export interface TransactionResponse {
 export interface TransactionUpdateRequest {
     status?: string;
     executionDate?: string;
+}
+
+export interface TransactionActionRequest {
+    id?: string;
+    ref?: string;
+    action: string;
+}
+
+export interface TransactionRefundRequest {
+    id?: string;
+    ref?: string;
+    amount?: number;
+    message?: string;
+}
+
+export interface TransactionRemoveRequest {
+    id?: string;
+    ref?: string;
+}
+
+export interface TransactionQueryRequest {
+    fromId?: string;
+    [key: string]: string | number | boolean | undefined;
+}
+
+export interface TransactionBulkResult {
+    batchId: string;
+}
+
+export interface TransactionBulkEntry {
+    id: number;
+    ref: string | null;
+    mndtId: string;
+    status: string;
 }

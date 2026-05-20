@@ -39,3 +39,14 @@ export interface CustomerResponse {
     mobile?: string;
     language?: string;
 }
+
+export interface CustomerLoginRequest {
+    customerNumber: string;
+    email?: string;
+    mobile?: string;
+}
+
+export interface CustomerLoginResponse {
+    url: string;
+    token?: string;
+}

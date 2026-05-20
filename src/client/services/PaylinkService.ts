@@ -1,11 +1,20 @@
 import {BaseService} from "./BaseService";
-import {PaylinkRequest, PaylinkResponse} from "../../models/Paylink";
+import {PaylinkRefundRequest, PaylinkRequest, PaylinkResponse} from "../../models/Paylink";
 import {FeedOptions} from "../../models/Document";
 
 export class PaylinkService extends BaseService {
 
   async create(request: PaylinkRequest): Promise<PaylinkResponse> {
     return this.post("/payment/link", request).then(value => value.data);
+  }
+
+  async detail(plId: number | string, includeRefunds = false): Promise<PaylinkResponse> {
+    const path = `/payment/link?id=${plId}${includeRefunds ? '&include=refunds' : ''}`;
+    return this.get(path).then(value => value.data.Links?.[0] ?? value.data);
+  }
+
+  async refund(request: PaylinkRefundRequest): Promise<void> {
+    await this.post("/payment/link/refund", request);
   }
 
   async *feed(options?: FeedOptions): AsyncGenerator<PaylinkResponse> {

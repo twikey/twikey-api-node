@@ -3,3 +3,8 @@ export * from "./models/Customer";
 export * from "./models/Document";
 export * from "./models/Invoice";
 export * from "./models/Transaction";
+export * from "./models/Paylink";
+export * from "./models/Subscription";
+export * from "./models/Transfer";
+export * from "./models/Collect";
+export * from "./models/Reporting";

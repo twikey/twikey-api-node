@@ -63,8 +63,27 @@ export interface EventError {
 }
 
 export interface InvoiceUpdateRequest {
-  state?: string; // New state
-  amount?: number; // New amount in cents
-  duedate?: string; // New due date (YYYYMMDD)
-  message?: string; // New message
+  state?: string;
+  amount?: number;
+  duedate?: string;
+  message?: string;
+}
+
+export interface InvoiceQrResponse {
+  url: string;
+  qr?: string;
+}
+
+export interface InvoiceActionRequest {
+  type: string;
+  extra?: string[];
+}
+
+export interface InvoiceBulkResult {
+  batchId: string;
+}
+
+export interface InvoiceBulkEntry {
+  id: string;
+  status: string;
 }

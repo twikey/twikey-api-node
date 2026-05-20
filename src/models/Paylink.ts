@@ -23,3 +23,9 @@ export interface PaylinkResponse {
     ref: string;
     state?: string;
 }
+
+export interface PaylinkRefundRequest {
+    id: number;
+    amount: number;
+    message?: string;
+}

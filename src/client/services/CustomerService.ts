@@ -1,5 +1,7 @@
 import { BaseService } from "./BaseService";
 import {
+    CustomerLoginRequest,
+    CustomerLoginResponse,
     CustomerRequest,
     CustomerResponse,
 } from "../../models/Customer";
@@ -32,5 +34,9 @@ export class CustomerService extends BaseService {
             }
         }
         await this.patch(`/customer/${encodeURIComponent(ref)}?${params.toString()}`);
+    }
+
+    async login(request: CustomerLoginRequest): Promise<CustomerLoginResponse> {
+        return this.post("/customeraccess", request).then(r => r.data);
     }
 }

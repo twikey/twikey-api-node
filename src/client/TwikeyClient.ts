@@ -5,6 +5,9 @@ import {TwikeyConfig} from "../models/Config";
 import {PaylinkService} from "./services/PaylinkService";
 import {SubscriptionService} from "./services/SubscriptionService";
 import {CustomerService} from "./services/CustomerService";
+import {TransferService} from "./services/TransferService";
+import {CollectService} from "./services/CollectService";
+import {ReportingService} from "./services/ReportingService";
 import {createHmac, timingSafeEqual} from "node:crypto";
 import {FetchClient} from "./HttpClient";
 export {TwikeyError} from "./HttpClient";
@@ -21,6 +24,9 @@ export class TwikeyClient {
   readonly paylink: PaylinkService;
   readonly subscription: SubscriptionService;
   readonly customer: CustomerService;
+  readonly transfer: TransferService;
+  readonly collect: CollectService;
+  readonly reporting: ReportingService;
 
   readonly apiKey: string;
   private sessionToken?: string;
@@ -45,6 +51,9 @@ export class TwikeyClient {
     this.paylink = new PaylinkService(this.client);
     this.subscription = new SubscriptionService(this.client);
     this.customer = new CustomerService(this.client);
+    this.transfer = new TransferService(this.client);
+    this.collect = new CollectService(this.client);
+    this.reporting = new ReportingService(this.client);
   }
 
   private async getSessionToken(): Promise<string> {

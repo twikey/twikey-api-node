@@ -1,5 +1,14 @@
 import {BaseResponse, BaseService} from "./BaseService";
-import {InvoiceRequest, InvoiceResponse, InvoiceUpdateRequest, PaymentResponse,} from "../../models/Invoice";
+import {
+  InvoiceActionRequest,
+  InvoiceBulkEntry,
+  InvoiceBulkResult,
+  InvoiceQrResponse,
+  InvoiceRequest,
+  InvoiceResponse,
+  InvoiceUpdateRequest,
+  PaymentResponse,
+} from "../../models/Invoice";
 import {FeedOptions, PdfResponse} from "../../models/Document";
 
 
@@ -75,6 +84,32 @@ export class InvoiceService extends BaseService {
 
   async update(invoiceId: string, update: InvoiceUpdateRequest): Promise<BaseResponse<InvoiceResponse>> {
     return this.post(`/invoice/${invoiceId}`, update);
+  }
+
+  async reoffer(invoiceId: string): Promise<void> {
+    await this.patch(`/invoice/${invoiceId}/reoffer`);
+  }
+
+  async qr(invoiceId: string): Promise<InvoiceQrResponse> {
+    return this.get(`/invoice/${invoiceId}/qr`, undefined, { "Content-Type": "application/json" }).then(value => value.data);
+  }
+
+  async action(invoiceId: string, request: InvoiceActionRequest): Promise<void> {
+    const extra = Array.isArray(request.extra) ? request.extra.join('&') : '';
+    const path = `/invoice/${invoiceId}/action?type=${request.type}${extra ? '&' + extra : ''}`;
+    await this.post(path, undefined, { "Content-Type": "application/json" });
+  }
+
+  async ubl(xmlBody: string | Buffer): Promise<InvoiceResponse> {
+    return this.post("/invoice/ubl", xmlBody, { "Content-Type": "application/xml" }).then(value => value.data);
+  }
+
+  async bulkCreate(invoices: InvoiceRequest[]): Promise<InvoiceBulkResult> {
+    return this.post("/invoice/bulk", invoices, { "Content-Type": "application/json" }).then(value => value.data);
+  }
+
+  async bulkStatus(batchId: string): Promise<InvoiceBulkEntry[]> {
+    return this.get("/invoice/bulk", { batchId }, { "Content-Type": "application/json" }).then(value => value.data);
   }
 
   async pdf(invoiceId: string): Promise<PdfResponse> {
