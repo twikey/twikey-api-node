@@ -1,4 +1,3 @@
-import axios, {AxiosInstance} from "axios";
 import {DocumentService} from "./services/DocumentService";
 import {InvoiceService} from "./services/InvoiceService";
 import {TransactionService} from "./services/TransactionService";
@@ -7,17 +6,21 @@ import {PaylinkService} from "./services/PaylinkService";
 import {SubscriptionService} from "./services/SubscriptionService";
 import {CustomerService} from "./services/CustomerService";
 import {createHmac, timingSafeEqual} from "node:crypto";
+import {FetchClient} from "./HttpClient";
+export {TwikeyError} from "./HttpClient";
 
 export class TwikeyClient {
 
-  private readonly client: AxiosInstance;
+  private readonly client: FetchClient;
+  private readonly baseURL: string;
+  private readonly userAgent: string;
 
   readonly document: DocumentService;
   readonly invoice: InvoiceService;
   readonly transaction: TransactionService;
   readonly paylink: PaylinkService;
   readonly subscription: SubscriptionService;
-  readonly creditor: CustomerService;
+  readonly customer: CustomerService;
 
   readonly apiKey: string;
   private sessionToken?: string;
@@ -25,43 +28,23 @@ export class TwikeyClient {
   private lastLogin?: number;
 
   constructor(config: TwikeyConfig) {
-    const baseUrl = config.apiUrl;
-    this.client = axios.create({
-      baseURL: baseUrl,
-      headers: {
-        "User-Agent": config.userAgent || "Twikey-NodeJS/1.0",
-        "Content-Type": "application/x-www-form-urlencoded",
-        Authorization: `${config.apiKey}`,
-      },
+    this.baseURL = config.apiUrl.replace(/\/$/, '');
+    this.userAgent = config.userAgent ?? "Twikey-NodeJS/1.0";
+    this.apiKey = config.apiKey;
+
+    this.client = new FetchClient(this.baseURL, {
+      "User-Agent": this.userAgent,
+      "Content-Type": "application/x-www-form-urlencoded",
     });
 
-    // Initialize services
+    this.client.setAuthProvider(() => this.getSessionToken());
+
     this.document = new DocumentService(this.client);
     this.invoice = new InvoiceService(this.client);
     this.transaction = new TransactionService(this.client);
     this.paylink = new PaylinkService(this.client);
     this.subscription = new SubscriptionService(this.client);
-    this.creditor = new CustomerService(this.client);
-
-    this.apiKey = config.apiKey;
-
-    // Add request interceptor for dynamic authorization
-    this.client.interceptors.request.use(async (config) => {
-      config.headers.Authorization = await this.getSessionToken();
-      return config;
-    });
-
-    // Add response interceptor for error handling
-    this.client.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response) {
-          const { status, data } = error.response;
-          throw new TwikeyError(status, data.code, data.extra);
-        }
-        throw error;
-      },
-    );
+    this.customer = new CustomerService(this.client);
   }
 
   private async getSessionToken(): Promise<string> {
@@ -71,36 +54,26 @@ export class TwikeyClient {
       const formData = new URLSearchParams();
       formData.append("apiToken", this.apiKey);
 
-      const response = await axios.post(`${this.client.defaults.baseURL}`,
-        formData,
-        { headers: { "Content-Type": "application/x-www-form-urlencoded" } },
-      );
-      if (response.status !== 200) {
-        throw new Error("Failed to login");
-      }
+      const response = await fetch(this.baseURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': this.userAgent,
+        },
+        body: formData.toString(),
+      });
+
+      if (!response.ok) throw new Error("Failed to login");
+
+      const data = await response.json() as { Authorization: string };
       this.lastLogin = now;
-      this.sessionToken = response.data.Authorization;
-      return response.data.Authorization;
+      this.sessionToken = data.Authorization;
+      return data.Authorization;
     }
     return this.sessionToken;
   }
 
-  // Helper method for making GET requests
-  protected async get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
-    const response = await this.client.get(endpoint, { params });
-    return response.data;
-  }
-
-  // Helper method for making POST requests
-  protected async post<T>(endpoint: string, data?: any, headers?: Record<string, string>): Promise<T> {
-    const response = await this.client.post(endpoint, data, { headers });
-    return response.data;
-  }
-
-  /**
-   * Handle webhook event
-   */
-  verifyWebHookSignature(signature: string,payload: string): boolean {
+  verifyWebHookSignature(signature: string, payload: string): boolean {
     const hmac = createHmac("sha256", this.apiKey)
         .update(payload)
         .digest("hex");
@@ -110,11 +83,5 @@ export class TwikeyClient {
 
   async ping() {
     return await this.getSessionToken();
-  }
-}
-
-export class TwikeyError extends Error {
-  constructor(statusCode: number,code: string,extra: string) {
-    super(`status=${statusCode} error=${code}` + (extra?` extra=${extra}`:''));
   }
 }
