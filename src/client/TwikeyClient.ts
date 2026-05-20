@@ -5,6 +5,7 @@ import {TransactionService} from "./services/TransactionService";
 import {TwikeyConfig} from "../models/Config";
 import {PaylinkService} from "./services/PaylinkService";
 import {SubscriptionService} from "./services/SubscriptionService";
+import {CreditorService} from "./services/CreditorService";
 import {createHmac, timingSafeEqual} from "node:crypto";
 
 export class TwikeyClient {
@@ -16,6 +17,7 @@ export class TwikeyClient {
   readonly transaction: TransactionService;
   readonly paylink: PaylinkService;
   readonly subscription: SubscriptionService;
+  readonly creditor: CreditorService;
 
   readonly apiKey: string;
   private sessionToken?: string;
@@ -39,6 +41,7 @@ export class TwikeyClient {
     this.transaction = new TransactionService(this.client);
     this.paylink = new PaylinkService(this.client);
     this.subscription = new SubscriptionService(this.client);
+    this.creditor = new CreditorService(this.client);
 
     this.apiKey = config.apiKey;
 
