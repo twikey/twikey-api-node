@@ -16,5 +16,11 @@ export interface CollectResponse {
 }
 
 export interface CollectQueryRequest {
-    [key: string]: string | number | boolean | undefined;
+    state?: 'sent' | 'archived' | 'cancelled';
+    generated?: string;
+    reqcolldt?: string;
+    ct?: number;
+    page?: number;
+    from?: string;
+    until?: string;
 }

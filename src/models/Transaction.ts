@@ -18,6 +18,7 @@ export interface Transaction {
     executionDate: string;
     ref?: string;
     remittance?: string;
+    scaUrl?: string;
 }
 
 export interface TransactionResponse {
