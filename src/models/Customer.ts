@@ -38,6 +38,8 @@ export interface CustomerResponse {
     country?: string;
     mobile?: string;
     language?: string;
+    peppol?: string;
+    delivery?: string;
 }
 
 export interface CustomerLoginRequest {

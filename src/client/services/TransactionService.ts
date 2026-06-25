@@ -22,8 +22,9 @@ export class TransactionService extends BaseService {
     return this.post("/transaction", { ...request, reservation: true }).then(value => value.data?.Entries?.[0] ?? value.data);
   }
 
-  async capture(request: TransactionRequest & { id?: string }): Promise<Transaction> {
-    return this.post("/transaction", request).then(value => value.data?.Entries?.[0] ?? value.data);
+  async capture(request: TransactionRequest & { id: string }): Promise<Transaction> {
+    const { id, ...body } = request;
+    return this.post("/transaction", body, { "X-Reservation": id }).then(value => value.data?.Entries?.[0] ?? value.data);
   }
 
   async action(request: TransactionActionRequest): Promise<void> {

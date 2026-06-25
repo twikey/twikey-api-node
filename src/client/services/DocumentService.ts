@@ -1,9 +1,13 @@
 import {BaseService} from "./BaseService";
 import {
+  CustomerAccessResponse,
   DocumentFeedMessage,
+  DocumentQueryRequest,
+  DocumentQueryResponse,
   DocumentRequest,
   DocumentResponse,
   DocumentSignRequest,
+  DocumentUpdateRequest,
   FeedOptions,
   PdfResponse,
 } from "../../models/Document";
@@ -14,11 +18,22 @@ export class DocumentService extends BaseService {
   }
 
   async sign(request: DocumentSignRequest): Promise<DocumentResponse> {
-    return this.post("/sign", request).then(value => value.data);
+    return this.post("/sign", request).then(value => {
+      const data = value.data;
+      // API returns MndtId (PascalCase) for the sign endpoint; normalise to mndtId
+      if (data.MndtId && !data.mndtId) data.mndtId = data.MndtId;
+      return data;
+    });
   }
 
-  async detail(mndtId: string): Promise<DocumentResponse> {
-    return this.get(`/mandate/detail`, { mndtId }).then(value => value.data);
+  async detail(mndtId: string, force?: boolean): Promise<DocumentResponse> {
+    const params: Record<string, any> = { mndtId };
+    if (force) params.force = true;
+    return this.get(`/mandate/detail`, params).then(value => value.data);
+  }
+
+  async query(params: DocumentQueryRequest): Promise<DocumentQueryResponse> {
+    return this.get('/mandate/query', params).then(value => value.data);
   }
 
   async *feed(options?: FeedOptions): AsyncGenerator<DocumentFeedMessage> {
@@ -81,5 +96,17 @@ export class DocumentService extends BaseService {
     await this.client.post(`/mandate/pdf?mndtId=${mndtId}`, pdfContent, {
       headers: { 'Content-Type': 'application/pdf' }
     });
+  }
+
+  async cancel(mndtId: string, rsn: string, notify = false): Promise<void> {
+    await this.delete('/mandate', { mndtId, rsn, notify });
+  }
+
+  async update(mndtId: string, fields: DocumentUpdateRequest): Promise<void> {
+    await this.post('/mandate/update', { mndtId, ...fields });
+  }
+
+  async customerAccess(mndtId: string): Promise<CustomerAccessResponse> {
+    return this.post('/customeraccess', { mndtId }).then(value => value.data);
   }
 }

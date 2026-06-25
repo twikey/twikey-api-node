@@ -12,12 +12,18 @@ export interface BaseInfo {
     companyName?: string;
     coc?: string;
     vatno?: string;
+    peppol?: string;
+    delivery?: string;
 }
 
 export interface DocumentRequest extends BaseInfo {
-    ct: number;
+    ct?: number;
+    tc?: string;
     iban?: string;
     bic?: string;
+    accountnumber?: string; // UK/BACS: 8-digit bank account number
+    sortcode?: string;      // UK/BACS: sort code in XX-XX-XX format
+    subregion?: string;     // UK/BACS: e.g. 'bacs'
     mandateNumber?: string;
     contractNumber?: string;
     campaign?: string;
@@ -76,8 +82,47 @@ export interface FeedOptions {
     last_position?: number;
 }
 
+export interface DocumentUpdateRequest {
+    state?: 'active',
+    iban?: string;
+    bic?: string;
+    mobile?: string;
+    email?: string;
+    firstname?: string;
+    lastname?: string;
+    companyName?: string;
+    coc?: string;
+    l?: string;
+    customerNumber?: string;
+    ct?: number;
+}
+
+export interface CustomerAccessResponse {
+    token: string;
+    url: string;
+}
+
 export interface PdfResponse {
     content: Buffer;
     filename: string;
+}
+
+export interface DocumentQueryRequest {
+    iban?: string;
+    customerNumber?: string;
+    email?: string;
+    state?: 'SIGNED' | 'PREPARED' | 'CANCELLED';
+    page?: number;
+}
+
+export interface DocumentContract {
+    mandateNumber: string;
+    state: string;
+    [key: string]: any;
+}
+
+export interface DocumentQueryResponse {
+    Contracts: DocumentContract[];
+    _links?: { self: string };
 }
 
