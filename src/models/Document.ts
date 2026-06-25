@@ -19,6 +19,7 @@ export interface BaseInfo {
 export interface DocumentRequest extends BaseInfo {
     ct?: number;
     tc?: string;
+    iban?: string;
     bic?: string;
     accountnumber?: string; // UK/BACS: 8-digit bank account number
     sortcode?: string;      // UK/BACS: sort code in XX-XX-XX format
