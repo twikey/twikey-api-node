@@ -18,8 +18,7 @@ export interface BaseInfo {
 
 export interface DocumentRequest extends BaseInfo {
     ct?: number;
-    tc?: string;          // scheme type code: 'CORE' | 'B2B' | 'RCC' | 'PAD' | 'BACS' etc.
-    iban?: string;
+    tc?: string;
     bic?: string;
     accountnumber?: string; // UK/BACS: 8-digit bank account number
     sortcode?: string;      // UK/BACS: sort code in XX-XX-XX format
@@ -83,7 +82,7 @@ export interface FeedOptions {
 }
 
 export interface DocumentUpdateRequest {
-    state?: 'active' | 'passive'; // 'passive' = suspend (uncollectable), 'active' = resume
+    state?: 'active',
     iban?: string;
     bic?: string;
     mobile?: string;
